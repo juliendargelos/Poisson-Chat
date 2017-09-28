@@ -12,33 +12,38 @@ export default {
       }
     })
 
-    var parseMessages = function (message) {
-      if (Array.isArray(message)) return parseMessages(message[0])
-      else {
-        var m = {
-          content: '',
-          author: 'Anonymous',
-          date: new Date()
-        }
-
-        if (typeof message === 'string') m.content = message
-        else if (typeof message === 'object' && message !== null) {
-          if (typeof message.body === 'string') m.content = message.body
-          if (typeof message.content === 'string') m.content = message.content
-
-          if (message.createdAt instanceof Date) m.date = message.createdAt
-          if (message.date instanceof Date) m.date = message.date
-
-          if (typeof message.author === 'object' && message.author !== null) m.author = message.author
-        }
-
-        return [m]
+    var parseMessage = function (message) {
+      var m = {
+        body: '',
+        author: {
+          username: 'Anonymous',
+          avatarUrl: ''
+        },
+        createdAt: Date.now()
       }
+
+      if (typeof message === 'string') m.body = message
+      else if (typeof message === 'object' && message !== null) {
+        if (typeof message.body === 'string') m.body = message.body
+        if (typeof message.content === 'string') m.body = message.content
+
+        if (message.createdAt instanceof Date) m.createdAt = message.createdAt.getTime()
+        if (message.date instanceof Date) m.createdAt = message.date.getTime()
+        if (typeof message.createdAt === 'number') m.createdAt = message.createdAt
+        if (typeof message.date === 'number') m.createdAt = message.date
+
+        if (typeof message.author === 'object' && message.author !== null) m.author = message.author
+        else if (typeof message.author === 'string') m.author = {username: message.author, avatarUrl: ''}
+      }
+
+      return m
     }
 
     socket.on('new message', function (message) {
+      console.log(message)
+      message = parseMessage(message)
       Vue.prototype.$store.messages.push(message)
-      console.log(Vue.prototype.$store.messages)
+      console.log(message)
     })
 
     Vue.mixin({
