@@ -13,6 +13,8 @@
 </template>
 
 <script>
+import avatar from '../../dataManager/avatar.js'
+
 export default {
   data: function () {
     return {
@@ -44,18 +46,6 @@ export default {
 
     valid: function () {
       return this.username.match(/^\w{1,15}$/) !== null
-    },
-
-    fingerprint: function () {
-      var chars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-
-      return this.username.toLowerCase().split('').reduce(function (sum, char) {
-        return sum + chars.indexOf(char)
-      }, 0)
-    },
-
-    avatar: function () {
-      return this.$store.avatars[this.fingerprint % this.$store.avatars.length]
     }
   },
 
@@ -65,8 +55,7 @@ export default {
         if (this.valid) {
           this.$emit('login', {
             username: this.username,
-            // id: this.fingerprint,
-            avatarUrl: this.avatar
+            avatarUrl: avatar.for({username: this.username})
           })
         } else {
           this.error = 'Invalid name'
@@ -118,7 +107,6 @@ export default {
     height: 150px
     margin-top: -180px
     margin-bottom: 0
-    transform: translateX(-8%)
     animation: login__logo .8s 1
 
   &__input
@@ -187,13 +175,13 @@ export default {
 
 @keyframes login__logo
   0%
-    transform: translate(-8%, 56px)
+    transform: translateY(56px)
 
   50%
-    transform: translate(-8%, 56px)
+    transform: translateY(56px)
 
   100%
-    transform: translate(-8%, 0)
+    transform: translateY(0)
 
 @keyframes login__input
   0%

@@ -1,7 +1,7 @@
 <template>
   <div class="users">
     <div class="users__user" v-for="user in users">
-      <user :user="user"></user>
+      <user :user="user" @talkTo="$emit('talkTo', $event)"></user>
     </div>
   </div>
 </template>

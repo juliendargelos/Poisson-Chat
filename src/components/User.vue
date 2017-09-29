@@ -1,6 +1,6 @@
 <template>
-  <div v-if="user" class="user">
-    <span :class="'user__image' + (user.avatarUrl ? '' : ' user__image--none')" :style="'background-image: url(' + user.avatarUrl + ')'">
+  <div v-if="user" class="user" @click="$emit('talkTo', user)">
+    <span class="user__image" :style="'background-image: url(' + avatar + ')'">
       <span v-if="status !== null" :class="'user__status user__status--'+status"></span>
     </span>
     <span class="user__name">{{ user.username }}</span>
@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import avatar from '../dataManager/avatar.js'
+
 export default {
   props: ['user', 'collapse', 'dark', 'online'],
 
@@ -15,7 +17,8 @@ export default {
     return {
       collapsed: null,
       darken: false,
-      status: null
+      status: null,
+      avatarUnreachable: false
     }
   },
 
@@ -25,7 +28,29 @@ export default {
     this.status = [undefined, null].includes(this.online) ? null : (this.online ? 'online' : 'offline')
   },
 
+  computed: {
+    avatar: function () {
+      if (this.user.avatarUrl && !this.avatarUnreachable) {
+        var self = this
+        var image = new window.Image()
+        image.onerror = function () {
+          self.avatarUnreachable = true
+        }
+        image.src = this.user.avatarUrl
+        image = null
+
+        return this.user.avatarUrl
+      } else {
+        return avatar.for(this.user)
+      }
+    }
+  },
+
   watch: {
+    user: function () {
+      this.avatarUnreachable = false
+    },
+
     collapsed: function (v) {
       var collapsed = this.$el.className.match(/\buser--collapsed--([^\s]+)\b/)
       collapsed = collapsed ? collapsed[1] : null
@@ -127,6 +152,7 @@ export default {
     display: inline-block
     position: relative
     font-size: 11px
+    text-align: center
     opacity: 0
     transition: opacity .3s
     &::before

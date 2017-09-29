@@ -1,11 +1,16 @@
 <template>
-  <div :class="'message' + (message.wizz ? ' message--wizz' : '')">
+  <div :class="'message' + (message.alert ? ' message--alert' : '') + (message.danger ? ' message--danger' : '')">
     <div class="message__author">
       <user :user="message.author" :collapse="aligned" :dark="true"></user>
     </div>
 
     <div class="message__container">
-      <p class="message__content">{{ message.body }}</p>
+      <p class="message__content">
+        <template v-for="part in prettyBody">
+          <template v-if="part.type == 'text'">{{ part.content }}</template>
+          <template v-if="part.type == 'user'"><span class="message__user" @click="$emit('talkTo', {username: part.content.substring(1)})">{{ part.content }}</span></template>
+        </template>
+      </p>
       <span class="message__date">
         <date :date="message.createdAt"></date>
       </span>
@@ -30,6 +35,40 @@ export default {
   created: function () {
     this.aligned = this.align
     this.higlighted = this.higlight
+  },
+
+  computed: {
+    prettyBody: function () {
+      var prettyBody = this.message.body.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+      var usernames = this.message.body.match(/@(\w{3,15})/)
+      var username
+
+      if (usernames) {
+        for (var i = 1; i < usernames.length; i++) {
+          username = usernames[i]
+          if (this.$store.users.filter(function (u) { return u.username === username }).length !== 0) {
+            prettyBody = prettyBody.replace(new RegExp('@(' + username + ')', 'g'), '<&user:@$1>')
+          }
+        }
+      }
+
+      prettyBody = prettyBody.split('<').map(function (part) { return part.split('>') }).reduce(function (parts, part) { return parts.concat(part) }, [])
+
+      return prettyBody.map(function (part) {
+        var match = part.match(/^&([^:]+):(.*)$/)
+        if (match) {
+          return {
+            type: match[1],
+            content: match[2]
+          }
+        } else {
+          return {
+            type: 'text',
+            content: part
+          }
+        }
+      })
+    }
   },
 
   watch: {
@@ -88,6 +127,17 @@ export default {
     flex-grow: 0
     flex-shrink: 0
 
+  &__user
+    background: $white
+    padding: 4px 8px
+    border-radius: 20px
+    cursor: pointer
+    color: $brand
+    font-size: 12px
+    display: inline-block
+    vertical-align: middle
+    line-height: normal
+
   &--aligned--right
     margin-left: auto
     flex-direction: row-reverse
@@ -100,6 +150,10 @@ export default {
     background-color: $white
     box-shadow: 0 15px 30px transparentize($black, .85)
     color: $brand
+
+  &--higlighted &__user
+    background: $brand
+    color: $white
 
   &__date
     margin-top: 10px
@@ -114,9 +168,15 @@ export default {
   &--aligned--right &__date
     text-align: left
 
-  &--wizz &__content
+  &--alert &__content
     border-radius: 100px
+    padding: 15px 20px
     border: 3px solid rgb(102, 195, 250)
+    color: darken(rgb(102, 195, 250), 10)
+
+  &--danger &__content
+    border-color: $red
+    color: $red
 
 @keyframes message
   0%

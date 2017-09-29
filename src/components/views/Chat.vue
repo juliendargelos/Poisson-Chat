@@ -3,12 +3,12 @@
     <sidebar>
       <user :user="$store.user" slot="heading"></user>
 
-      <users :users="$store.users"></users>
+      <users :users="$store.users" @talkTo="talkTo"></users>
     </sidebar>
 
     <div class="chat__content">
-      <messages :messages="$store.messages" :owner="$store.user"></messages>
-      <message-form @submit="send"></message-form>
+      <messages :messages="$store.messages" :owner="$store.user" @talkTo="talkTo"></messages>
+      <message-form @submit="send" :talkTo="talkToUser"></message-form>
     </div>
   </main>
 </template>
@@ -22,6 +22,18 @@ import Users from '../Users'
 import User from '../User'
 
 export default {
+  data: function () {
+    return {
+      talkToUser: null
+    }
+  },
+
+  methods: {
+    talkTo: function (user) {
+      this.talkToUser = user
+    }
+  },
+
   components: {
     Sidebar,
     SearchForm,

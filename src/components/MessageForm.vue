@@ -13,6 +13,8 @@
 
 <script>
 export default {
+  props: ['talkTo'],
+
   data: function () {
     return {
       input: '',
@@ -27,6 +29,15 @@ export default {
       if (this.$store.typing.length === 0) return null
       if (this.$store.typing.length === 1) return this.$store.typing[0].username + ' is typing...'
       else return this.$store.typing.slice(0, this.$store.typing.length - 1).map(function (u) { return u.username }).join(', ') + ' and ' + this.$store.typing[this.$store.typing.length - 1].username + ' are typing...'
+    }
+  },
+
+  watch: {
+    talkTo: function (user) {
+      if (typeof user === 'object' && user !== null) {
+        this.input = '@' + user.username + ' ' + this.input
+        this.$el.querySelector('.message-form__input').focus()
+      }
     }
   },
 
@@ -46,6 +57,7 @@ export default {
 
     wizz: function () {
       this.$emit('submit', {
+        alert: true,
         wizz: true,
         body: '💦',
         author: this.$store.user,
@@ -90,6 +102,7 @@ export default {
     display: flex
 
   &__typing
+    padding-left: 25px
     margin-bottom: 10px
     font-size: 8px
     font-weight: bold

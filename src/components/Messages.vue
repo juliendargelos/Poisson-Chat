@@ -7,7 +7,7 @@
     </div>
     <div class="messages__content">
       <div class="messages__message" v-for="message in messages">
-        <message :message="message" :align="message.author == owner ? 'right' : 'left'" :higlight="message.author == owner"></message>
+        <message :message="message" :align="message.author == owner ? 'right' : 'left'" :higlight="message.author == owner" @talkTo="$emit('talkTo', $event)"></message>
       </div>
     </div>
 
@@ -68,7 +68,8 @@ export default {
       var self = this
 
       setTimeout(function () {
-        self.$el.scroll({top: self.$el.scrollHeight, left: 0, behavior: 'smooth'})
+        // self.$el.scroll({top: self.$el.scrollHeight, left: 0, behavior: 'smooth'})
+        self.$el.scrollTop = self.$el.scrollHeight
       }, 1)
     },
 
@@ -117,10 +118,11 @@ export default {
   flex-grow: 1
   flex-shrink: 1
   overflow: scroll
+  // transform: translateZ(0)
 
   &__content
     width: 100%
-    padding: 30px 30px 116px 30px
+    padding: 30px 30px 130px 30px
     box-sizing: border-box
     display: flex
     flex-direction: column
@@ -135,6 +137,7 @@ export default {
     height: 100%
     top: 0
     left: 0
+    z-index: -1
     position: absolute
     transform: translateZ(0)
 

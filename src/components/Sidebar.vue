@@ -111,7 +111,7 @@ export default {
   &__toggler
     background-color: transparentize($brand, 1)
     width: 80px
-    height: 70px
+    height: 80px
     cursor: pointer
     display: flex
     align-items: center
