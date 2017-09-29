@@ -1,5 +1,5 @@
 <template>
-  <div class="user">
+  <div v-if="user" class="user">
     <span :class="'user__image' + (user.avatarUrl ? '' : ' user__image--none')" :style="'background-image: url(' + user.avatarUrl + ')'">
       <span v-if="status !== null" :class="'user__status user__status--'+status"></span>
     </span>

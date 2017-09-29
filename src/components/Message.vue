@@ -1,5 +1,5 @@
 <template>
-  <div class="message">
+  <div :class="'message' + (message.wizz ? ' message--wizz' : '')">
     <div class="message__author">
       <user :user="message.author" :collapse="aligned" :dark="true"></user>
     </div>
@@ -113,6 +113,10 @@ export default {
 
   &--aligned--right &__date
     text-align: left
+
+  &--wizz &__content
+    border-radius: 100px
+    border: 3px solid rgb(102, 195, 250)
 
 @keyframes message
   0%

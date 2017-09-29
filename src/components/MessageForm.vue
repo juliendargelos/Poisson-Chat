@@ -26,7 +26,7 @@ export default {
     typingUsers: function () {
       if (this.$store.typing.length === 0) return null
       if (this.$store.typing.length === 1) return this.$store.typing[0].username + ' is typing...'
-      else return this.$store.typing.slice(0, this.$store.length - 1).join(', ') + ' and ' + this.$store.typing[this.$store.typing.length - 1] + ' are typing...'
+      else return this.$store.typing.slice(0, this.$store.typing.length - 1).map(function (u) { return u.username }).join(', ') + ' and ' + this.$store.typing[this.$store.typing.length - 1].username + ' are typing...'
     }
   },
 
@@ -46,9 +46,10 @@ export default {
 
     wizz: function () {
       this.$emit('submit', {
-        type: 'wizz',
-        content: '💦',
-        date: Date.now()
+        wizz: true,
+        body: '💦',
+        author: this.$store.user,
+        createdAt: Date.now()
       })
     },
 
@@ -120,7 +121,6 @@ export default {
     background-color: lighten($brand, 10)
     background-repeat: no-repeat
     background-position: center center
-    background-size: 30% auto
     border-radius: 50px
     width: 56px
     height: 56px
@@ -138,22 +138,25 @@ export default {
 
   &__submit
     background-image: url('/static/assets/send.svg')
-    margin-left: 30px
+    background-size: 30% auto
+    margin-left: 20px
 
   &__wizz
     background-image: url('/static/assets/wizz.svg')
-    margin-left: -56px
-    z-index: -1
-    opacity: 0
-    position: relative
-    transition: .2s
-    &::before
-      content: ''
-      width: 56px
-      height: 100px
-      display: block
+    background-size: 50% auto
+    margin-left: 20px
+  //   z-index: -1
+  //   opacity: 0
+  //   position: relative
+  //   transition: .2s
+  //   &::before
+  //     content: ''
+  //     background: red
+  //     width: 56px
+  //     height: 100px
+  //     display: block
 
-  &__submit:hover + &__wizz, &__wizz:hover
-    opacity: 1
-    transform: translateY(calc(-100% - 20px))
+  // &__submit:hover + &__wizz, &__wizz:hover
+  //   opacity: 1
+  //   transform: translateY(calc(-100% - 20px))
 </style>

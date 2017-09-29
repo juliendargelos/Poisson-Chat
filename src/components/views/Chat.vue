@@ -1,7 +1,7 @@
 <template>
   <main class="chat">
     <sidebar>
-      <a class="chat__logout" href="/logout" slot="heading">Logout</a>
+      <user :user="$store.user" slot="heading"></user>
 
       <users :users="$store.users"></users>
     </sidebar>
@@ -19,6 +19,7 @@ import SearchForm from '../SearchForm'
 import MessageForm from '../MessageForm'
 import Messages from '../Messages'
 import Users from '../Users'
+import User from '../User'
 
 export default {
   components: {
@@ -26,7 +27,8 @@ export default {
     SearchForm,
     MessageForm,
     Messages,
-    Users
+    Users,
+    User
   }
 }
 </script>

@@ -1,5 +1,10 @@
 <template>
   <div class="messages">
+    <div class="messages__wizz">
+      <template v-for="bubble in bubbles">
+        <div v-if="bubble" :class="'messages__bubble messages__bubble--type--' + bubble.type" :style="'left:' + bubble.left + 'px;animation-delay:' + bubble.delay + 's'"></div>
+      </template>
+    </div>
     <div class="messages__content">
       <div class="messages__message" v-for="message in messages">
         <message :message="message" :align="message.author == owner ? 'right' : 'left'" :higlight="message.author == owner"></message>
@@ -24,7 +29,8 @@ export default {
 
   data: function () {
     return {
-      length: 0
+      length: 0,
+      bubbles: []
     }
   },
 
@@ -32,11 +38,25 @@ export default {
     this.scrollDown()
   },
 
+  computed: {
+    wizzing: function () {
+      return this.bubbles.length !== 0
+    }
+  },
+
   watch: {
     messages: function () {
-      if (this.messages.length > this.length) {
+      var delta = this.messages.length > this.length
+      if (delta > 0) {
         this.scrollDown()
         this.sound()
+
+        for (var i = this.length; i < this.messages.length; i++) {
+          if (this.messages[i].wizz) {
+            this.wizz()
+            break
+          }
+        }
       }
 
       this.length = this.messages.length
@@ -68,13 +88,19 @@ export default {
       wizz.currentTime = 0
       wizz.play()
 
-      setTimeout(function () {
-        self.$el.className = self.$el.className.replace(/\bmessages--wizz\b/, '') + ' messages--wizz'
-      }, 500)
+      if (!this.wizzing) {
+        this.bubbles = (new Array(50)).fill(null, 0, 50).map(function (b, i) {
+          return {
+            type: (Math.floor(Math.random() * 10) + 1),
+            left: Math.floor(Math.random() * window.innerWidth),
+            delay: Math.random() * 2
+          }
+        })
 
-      setTimeout(function () {
-        self.$el.className = self.$el.className.replace(/\bmessages--wizz\b/, '')
-      }, 1500)
+        setTimeout(function () {
+          self.bubbles = []
+        }, 5000)
+      }
     }
   },
 
@@ -104,7 +130,42 @@ export default {
   &__message:not(:last-of-type)
     margin-bottom: 30px
 
-  &--wizz
-    overflow: hidden
-    animation: wizz .3s 1
+  &__wizz
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    position: absolute
+    transform: translateZ(0)
+
+  &__bubble
+    background-repeat: no-repeat
+    background-position: center center
+    background-size: contain
+    top: 100%
+    left: 0
+    -webkit-will-change: top
+    will-change: top
+
+    @for $i from 1 to 10
+      &--type--#{$i}
+        $size: random(100) + 20px
+        background-image: url('/static/assets/bubble-#{$i%2 + 1}.svg')
+        width: $size
+        height: $size
+        position: absolute
+        animation: messages__bubble--type--#{$i} random(4) + 1s 1
+
+      @keyframes messages__bubble--type--#{$i}
+        0%
+          top: 100%
+          transform: translate(0, 0)
+
+        @for $j from 2 to 4
+          #{$j * 20}%
+            transform: translate(random(30) - 15px, 0)
+
+        100%
+          top: -50%
+          transform: translate(0, 0)
 </style>

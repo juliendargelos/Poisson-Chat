@@ -12,16 +12,20 @@ export default {
     },
 
     pretty: function () {
-      var date = ''
+      if (typeof this.date === 'number') {
+        var date = ''
 
-      if (this.today) date = 'Today '
-      else if (this.yesterday) date = 'Yesterday '
-      else {
-        date = this.day + ' ' + this.monthName + ' '
-        if (!this.thisYear) date += this.year + ' '
+        if (this.today) date = 'Today '
+        else if (this.yesterday) date = 'Yesterday '
+        else {
+          date = this.day + ' ' + this.monthName + ' '
+          if (!this.thisYear) date += this.year + ' '
+        }
+
+        return date + this.time
+      } else {
+        return ''
       }
-
-      return date + this.time
     },
 
     now: function () {
