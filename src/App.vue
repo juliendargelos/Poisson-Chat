@@ -9,6 +9,7 @@
 <script>
 export default {
   mounted: function () {
+    this.loadAvatars()
     this.direct()
     window.gna = this
   },
@@ -34,6 +35,33 @@ export default {
     logout: function () {
       this.$store.user = null
       this.$router.push({ path: '/' })
+    },
+
+    loadAvatars () {
+      var self = this
+
+      this.$store.avatars = (new Array(12)).fill(null, 0, 12).map(function (a, n) {
+        return self.base64FileUrl('/static/assets/fishes/fish-' + (n + 1) + '.svg', function (url) {
+          self.$store.avatars[n] = url
+        })
+      })
+    },
+
+    base64FileUrl (url, callback) {
+      var xhr = new window.XMLHttpRequest()
+      xhr.onload = function () {
+        var reader = new window.FileReader()
+        reader.onloadend = function () {
+          callback(reader.result)
+        }
+        reader.readAsDataURL(xhr.response)
+      }
+
+      xhr.open('GET', url)
+      xhr.responseType = 'blob'
+      xhr.send()
+
+      return url
     }
   }
 }

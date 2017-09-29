@@ -1,4 +1,5 @@
 import io from 'socket.io-client'
+// import parser from './parser'
 
 export default {
   install (Vue, options) {
@@ -7,43 +8,31 @@ export default {
     Vue.prototype.$store = new Vue({
       data: {
         user: null,
-        users: ['yo', 'yoyo', 'yoyoyo'],
-        messages: []
+        users: [],
+        messages: [],
+        avatars: []
       }
     })
 
-    var parseMessage = function (message) {
-      var m = {
-        body: '',
-        author: {
-          username: 'Anonymous',
-          avatarUrl: ''
-        },
-        createdAt: Date.now()
-      }
-
-      if (typeof message === 'string') m.body = message
-      else if (typeof message === 'object' && message !== null) {
-        if (typeof message.body === 'string') m.body = message.body
-        if (typeof message.content === 'string') m.body = message.content
-
-        if (message.createdAt instanceof Date) m.createdAt = message.createdAt.getTime()
-        if (message.date instanceof Date) m.createdAt = message.date.getTime()
-        if (typeof message.createdAt === 'number') m.createdAt = message.createdAt
-        if (typeof message.date === 'number') m.createdAt = message.date
-
-        if (typeof message.author === 'object' && message.author !== null) m.author = message.author
-        else if (typeof message.author === 'string') m.author = {username: message.author, avatarUrl: ''}
-      }
-
-      return m
-    }
+    socket.on('getUser', function (clients) {
+      console.log(clients)
+    })
 
     socket.on('new message', function (message) {
-      console.log(message)
-      message = parseMessage(message)
-      Vue.prototype.$store.messages.push(message)
-      console.log(message)
+      // TODO: rework
+      // if (message.author.id !== Vue.prototype.$store.user.id) {
+      //   Vue.prototype.$store.messages.push(message)
+      // }
+
+      // TODO: remove
+      if (message.body.author.id !== Vue.prototype.$store.user.id) {
+        Vue.prototype.$store.messages.push(message.body)
+      }
+    })
+
+    socket.on('user connected', function (user) {
+      window.gna = Vue.prototype.$store
+      Vue.prototype.$store.user = user
     })
 
     Vue.mixin({

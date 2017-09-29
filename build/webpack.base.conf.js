@@ -18,6 +18,7 @@ module.exports = {
     alias: {
       'vue': 'vue/dist/vue.common.js',
       'smoothscroll-polyfill': 'smoothscroll-polyfill/dist/smoothscroll.min.js',
+      'base-64': 'base64/base64.js',
       'bourgeon': path.resolve(__dirname, '../src/bourgeon'),
       'utils': path.resolve(__dirname, './utils'),
       'src': path.resolve(__dirname, '../src'),

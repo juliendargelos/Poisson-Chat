@@ -51,11 +51,11 @@ export default {
 
       return this.username.toLowerCase().split('').reduce(function (sum, char) {
         return sum + chars.indexOf(char)
-      }, 0) % 11 + 1
+      }, 0)
     },
 
     avatar: function () {
-      return '/static/assets/fishes/fish-' + this.fingerprint + '.svg'
+      return this.$store.avatars[this.fingerprint % this.$store.avatars.length]
     }
   },
 
