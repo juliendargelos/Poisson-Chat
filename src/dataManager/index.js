@@ -1,5 +1,5 @@
 import io from 'socket.io-client'
-// import parser from './parser'
+import parser from './parser'
 
 export default {
   install (Vue, options) {
@@ -10,23 +10,19 @@ export default {
         user: null,
         users: [],
         messages: [],
-        avatars: []
+        avatars: [],
+        typing: []
       }
     })
 
-    socket.on('getUser', function (clients) {
-      console.log(clients)
+    socket.on('getUsers', function (clients) {
+      Vue.prototype.$store.users = clients
     })
 
     socket.on('new message', function (message) {
-      // TODO: rework
-      // if (message.author.id !== Vue.prototype.$store.user.id) {
-      //   Vue.prototype.$store.messages.push(message)
-      // }
-
-      // TODO: remove
-      if (message.body.author.id !== Vue.prototype.$store.user.id) {
-        Vue.prototype.$store.messages.push(message.body)
+      message = parser.message(message)
+      if (!Vue.prototype.$store.user || message.author.id !== Vue.prototype.$store.user.id) {
+        Vue.prototype.$store.messages.push(message)
       }
     })
 
@@ -35,18 +31,34 @@ export default {
       Vue.prototype.$store.user = user
     })
 
+    socket.on('typing', function (user) {
+      if (Vue.prototype.$store.typing.filter(function (u) { u.id === user.id }).length === 0 && user.id !== Vue.prototype.$store.user.id) {
+        console.log('TYPING')
+        Vue.prototype.$store.typing.push(user)
+      }
+    })
+
+    socket.on('stop typing', function (user) {
+      Vue.prototype.$store.typing = Vue.prototype.$store.typing.filter(function (u) { u.id !== user.id })
+    })
+
     Vue.mixin({
       methods: {
         send: function (message) {
           this.$store.messages.push(message)
-          socket.emit('new message', message)
+          socket.emit('new message', message.body)
         },
 
-        connect: function (user, avatar) {
-          socket.emit('user connected', {
-            username: user,
-            avatarUrl: avatar
-          })
+        connect: function (user) {
+          socket.emit('user connected', user)
+        },
+
+        typing: function () {
+          socket.emit('typing', this.$store.user)
+        },
+
+        stopTyping: function () {
+          socket.emit('stop typing', this.$store.user)
         }
       }
     })

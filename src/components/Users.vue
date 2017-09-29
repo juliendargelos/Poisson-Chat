@@ -1,7 +1,7 @@
 <template>
   <div class="users">
     <div class="users__user" v-for="user in users">
-      <user :user="user" :online="Math.random() >= 0.5"></user>
+      <user :user="user"></user>
     </div>
   </div>
 </template>

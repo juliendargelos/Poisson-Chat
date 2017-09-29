@@ -29,6 +29,7 @@ export default {
 
     login: function (user) {
       this.$store.user = user
+      this.connect(user)
       this.$router.push({ path: '/' })
     },
 

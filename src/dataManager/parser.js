@@ -1,29 +1,21 @@
 export default {
   message (message) {
-    var m = {
+    if (typeof message !== 'object' || message === null) message = {}
+
+    return Object.assign({
       body: '',
-      author: {
-        id: null,
-        username: 'Anonymous',
-        avatarUrl: ''
-      },
+      author: this.user(),
       createdAt: Date.now()
-    }
+    }, Object.assign(message, {author: this.user(message.author)}))
+  },
 
-    if (typeof message === 'string') m.body = message
-    else if (typeof message === 'object' && message !== null) {
-      if (typeof message.body === 'string') m.body = message.body
-      if (typeof message.content === 'string') m.body = message.content
+  user (user) {
+    if (typeof user !== 'object' || user === null) user = {}
 
-      if (message.createdAt instanceof Date) m.createdAt = message.createdAt.getTime()
-      if (message.date instanceof Date) m.createdAt = message.date.getTime()
-      if (typeof message.createdAt === 'number') m.createdAt = message.createdAt
-      if (typeof message.date === 'number') m.createdAt = message.date
-
-      if (typeof message.author === 'object' && message.author !== null) m.author = message.author
-      else if (typeof message.author === 'string') m.author = {username: message.author, avatarUrl: ''}
-    }
-
-    return m
+    return Object.assign({
+      id: null,
+      username: 'Anonymous',
+      avatarUrl: ''
+    }, user)
   }
 }

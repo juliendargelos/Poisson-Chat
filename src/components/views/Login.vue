@@ -65,7 +65,7 @@ export default {
         if (this.valid) {
           this.$emit('login', {
             username: this.username,
-            id: this.fingerprint,
+            // id: this.fingerprint,
             avatarUrl: this.avatar
           })
         } else {

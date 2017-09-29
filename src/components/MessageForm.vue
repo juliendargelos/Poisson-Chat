@@ -1,8 +1,13 @@
 <template>
   <form class="message-form" @submit.prevent="submit">
-    <input class="message-form__input" type="text" v-model="input" placeholder="Your message...">
-    <input class="message-form__submit" type="submit">
-    <span class="message-form__wizz" @click="wizz"></span>
+    <transition name="fade-down">
+      <p v-if="typingUsers !== null" class="message-form__typing">{{ typingUsers }}</p>
+    </transition>
+    <div class="message-form__field">
+      <input class="message-form__input" type="text" v-model="input" placeholder="Your message..." @keydown="keydown">
+      <input class="message-form__submit" type="submit">
+      <span class="message-form__wizz" @click="wizz"></span>
+    </div>
   </form>
 </template>
 
@@ -10,7 +15,18 @@
 export default {
   data: function () {
     return {
-      input: ''
+      input: '',
+      isTyping: false,
+      typingTimeout: null,
+      typingInterval: 500
+    }
+  },
+
+  computed: {
+    typingUsers: function () {
+      if (this.$store.typing.length === 0) return null
+      if (this.$store.typing.length === 1) return this.$store.typing[0].username + ' is typing...'
+      else return this.$store.typing.slice(0, this.$store.length - 1).join(', ') + ' and ' + this.$store.typing[this.$store.typing.length - 1] + ' are typing'
     }
   },
 
@@ -34,6 +50,21 @@ export default {
         content: '💦',
         date: Date.now()
       })
+    },
+
+    keydown: function () {
+      var self = this
+
+      if (!this.isTyping) {
+        this.isTyping = true
+        this.typing()
+      }
+
+      clearTimeout(this.typingTimeout)
+      this.typingTimeout = setTimeout(function () {
+        self.isTyping = false
+        self.stopTyping()
+      }, this.typingInterval)
     }
   }
 }
@@ -48,12 +79,22 @@ export default {
   padding: 30px
   box-sizing: border-box
   position: absolute
-  display: flex
   flex-grow: 0
   flex-shrink: 0
   transform: translateY(-100%)
   +max(small)
     padding: 0
+
+  &__field
+    display: flex
+
+  &__typing
+    margin-bottom: 10px
+    font-size: 8px
+    font-weight: bold
+    color: transparentize($white, .5)
+    text-transform: uppercase
+    letter-spacing: .1em
 
   &__input
     background: $white

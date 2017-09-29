@@ -1,6 +1,6 @@
 <template>
   <div class="user">
-    <span class="user__image" :style="'background-image: url(' + user.avatarUrl + ')'">
+    <span :class="'user__image' + (user.avatarUrl ? '' : ' user__image--none')" :style="'background-image: url(' + user.avatarUrl + ')'">
       <span v-if="status !== null" :class="'user__status user__status--'+status"></span>
     </span>
     <span class="user__name">{{ user.username }}</span>
@@ -22,7 +22,7 @@ export default {
   created: function () {
     this.collapsed = this.collapse
     this.darken = this.dark
-    this.status = this.online === null ? null : (this.online ? 'online' : 'offline')
+    this.status = [undefined, null].includes(this.online) ? null : (this.online ? 'online' : 'offline')
   },
 
   watch: {
@@ -66,7 +66,8 @@ export default {
     // background-color: $white
     background-repeat: no-repeat
     background-position: center center
-    background-size: 80% auto
+    // background-size: 80% auto
+    background-size: contain
     margin-right: 10px
     border-radius: 40px
     width: 40px
@@ -74,7 +75,19 @@ export default {
     position: relative
     flex-shrink: 0
     flex-grow: 0
-    box-shadow: 0 10px 20px transparentize($black, .9)
+    // box-shadow: 0 10px 20px transparentize($black, .9)
+    &--none
+      background-color: transparentize($white, .8)
+      &::before
+        content: '?'
+        top: 50%
+        left: 50%
+        margin-top: 1px
+        position: absolute
+        font-size: 16px
+        color: transparentize($white, .8)
+        transform: translate(-50%, -50%)
+
 
   &__name
     white-space: keep-all
