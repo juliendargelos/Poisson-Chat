@@ -26,7 +26,7 @@ export default {
     typingUsers: function () {
       if (this.$store.typing.length === 0) return null
       if (this.$store.typing.length === 1) return this.$store.typing[0].username + ' is typing...'
-      else return this.$store.typing.slice(0, this.$store.length - 1).join(', ') + ' and ' + this.$store.typing[this.$store.typing.length - 1] + ' are typing'
+      else return this.$store.typing.slice(0, this.$store.length - 1).join(', ') + ' and ' + this.$store.typing[this.$store.typing.length - 1] + ' are typing...'
     }
   },
 
